@@ -1,0 +1,21 @@
+{
+  "name": "audioFun",
+  "version": "0.0.0",
+  "description": "playing with baudio",
+  "main": "makeNoise.js",
+  "dependencies": {
+    "baudio": "~1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "keywords": [
+    "baudio",
+    "audio",
+    "demo"
+  ],
+  "author": "tedhille@gmail.com",
+  "license": "BSD"
+}
