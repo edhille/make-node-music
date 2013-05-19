@@ -24,8 +24,9 @@ describe('Soxy', function() {
          soxy = null;
       });
 
-      it('should be able to play a simple stream', function() {
+      it('should be able to play a simple stream', function(done) {
          (function() {
+            soxy.once('done', function() { done(); });
             soxy.play(fileStream);
          }).should.not.throw();
       });
@@ -49,8 +50,11 @@ describe('Soxy', function() {
                });
                soxy.play(fileStream);
             }).should.not.throw();
-
          });
       });
+   });
+
+   describe('add filters', function() {
+      it('should be able to add filters...');
    });
 });

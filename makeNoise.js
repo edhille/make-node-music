@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var soxy = require('./soxy')(),
-    filter = require('./test-filter'),
+    filter = require('./filters/test-filter'),
     fs = require('fs'),
     fsStreamOne = fs.createReadStream('./package.json');
 
@@ -10,7 +10,7 @@ console.log('Ready to make sounds?');
 soxy.addFilter(filter('one'));
 soxy.play(fsStreamOne);
 
-fsStreamOne.on('end', function() {
+fsStreamOne.once('end', function() {
    var fsStreamTwo = fs.createReadStream('./README.md');
 
    console.log('yo');

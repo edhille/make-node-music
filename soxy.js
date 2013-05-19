@@ -26,7 +26,7 @@ Soxy.prototype.play = function(inStream) {
       lastStream.on('error', function() {
          console.error('stream error: ', arguments);
       });
-      lastStream = lastStream.pipe(this.filters[i]);
+      lastStream = lastStream.pipe(this.filters[i].getStream());
    }
 
    soxyStream.on('error', function() {
