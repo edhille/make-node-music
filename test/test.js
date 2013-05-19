@@ -1,28 +1,23 @@
 var should = require('should'),
    fs = require('fs'),
-   Soxy = require('../soxy');
+   Soxy = require('../soxy'),
+   TestFilter = require('../filters/test-filter');
 
 describe('Soxy', function() {
-   var fileStream = null;
+   var fileStream = null,
+       soxy = null;;
 
    beforeEach(function() {
       fileStream = fs.createReadStream('test/fixtures/simple-file.txt');
+      soxy = Soxy();
    });
 
    afterEach(function() {
       fileStream = null;
+      soxy = null;
    });
 
    describe('"play" a file', function() {
-      var soxy = null;
-
-      beforeEach(function() {
-         soxy = Soxy();
-      });
-
-      afterEach(function() {
-         soxy = null;
-      });
 
       it('should be able to play a simple stream', function(done) {
          (function() {
@@ -55,6 +50,23 @@ describe('Soxy', function() {
    });
 
    describe('add filters', function() {
-      it('should be able to add filters...');
+      var testFilter = null;
+
+      beforeEach(function() {
+         testFilter = TestFilter('one');
+      });
+
+      afterEach(function() {
+         testFilter = null;
+      });
+
+      it('should be able to add filters', function(done) {
+         soxy.addFilter(testFilter);
+
+         (function() {
+            soxy.once('done', function() { done(); });
+            soxy.play(fileStream);
+         }).should.not.throw();
+      });
    });
 });

@@ -10,24 +10,34 @@ function Filter(id) {
 }
 
 Filter.prototype.getStream = function() {
-   return new FilterStream(this.id);
+   return new FilterStream(this.filter.bind(this));
 };
 
-function FilterStream(id) {
+Filter.prototype.filter = function(chunk, encoding) {
+   console.log('FilterStream(' + this.id + ')', chunk.toString());
+
+   return chunk;
+};
+
+function FilterStream(callback) {
    Stream.Transform.call(this);
 
    this.on('pipe', function() {
       console.log('being piped');
    });
 
-   this.id = id;
+   this.callback = callback;
 }
 
-FilterStream.prototype = Object.create(Stream.Transform.prototype, { constructor: { value: FilterStream }});
+FilterStream.prototype = Object.create(
+   Stream.Transform.prototype, 
+   {
+      constructor: { value: FilterStream }
+   }
+);
 
 FilterStream.prototype._transform = function(chunk, encoding, done) {
-   console.log('FilterStream(' + this.id + ')', chunk.toString());
-   this.push(chunk);
+   this.push(this.callback(chunk, encoding));
    done();
 };
 
