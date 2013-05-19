@@ -43,11 +43,13 @@ describe('Soxy', function() {
 
          it('should be able to play two streams', function(done) {
             (function() {
-               fileStream.on('done', function() {
+               soxy.once('done', function() {
                   soxy.play(secondStream);
+                  soxy.once('done', function() { done(); });
                });
                soxy.play(fileStream);
             }).should.not.throw();
+
          });
       });
    });
