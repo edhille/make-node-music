@@ -23,15 +23,3 @@ fsStreamOne.once('end', function() {
       console.error(e);
    }
 });
-
-/*
-TODO:
-	- how can streams be used to allow chaining of wave generators?
-	- or, another way, is it possible to dynamically add/remove wave generators from a chain?
-*/
-
-
-/*
- *
- *  (someFile) ===> [parse tokens] ===> [add/remove filter based upon token] ===> [send to sox]
- */
