@@ -7,33 +7,44 @@ module.exports = function() {
    return new Soxy();
 };
 
-function Soxy() {
+// Soxy Class
+
+function Soxy(opts) {
+   opts = opts || {};
+
    this.filters = [];
+   this.channels = [];
+
+   this.size = opts.size || 2048;
+   this.rate = opts.rate || 44000;
+   this.chunkSize = opts.chunkSize || 16;
 }
 
 Util.inherits(Soxy, Events.EventEmitter);
 
 Soxy.prototype.addFilter = function(filter) {
+   filter.chunkSize = this.chunkSize;
+
    this.filters.push(filter);
 };
 
 Soxy.prototype.play = function(opts) {
-   var soxyStream = new SoxyStream(),
+   var soxyStream = new SoxyStream({ chunkSize: this.chunkSize }),
        lastStream = new SoxyTimeStream(),
        filterCnt  = this.filters.length,
        opts = opts || {},
        i = 0;
 
    for (; i < filterCnt; ++i) {
-      lastStream.on('error', function() {
-         console.error('stream error: ', arguments);
+      lastStream.on('error', function(err) {
+         console.error('stream error: ', err);
       });
 
       lastStream = lastStream.pipe(this.filters[i].getStream());
    }
 
-   soxyStream.on('soxyStream error', function() {
-      console.error('stream error: ', arguments);
+   soxyStream.on('error', function(err) {
+      console.error('soxyStream error: ', err);
    });
 
    var handleFinish = function() {
@@ -42,26 +53,54 @@ Soxy.prototype.play = function(opts) {
 
    soxyStream.once('finish', handleFinish.bind(this));
 
-   var ps = spawn('play', mergeArgs(opts, {
+   var ps = spawn('echo');
+/*   var ps = spawn('play', mergeArgs(opts, {
       c: 1,//this.channels.length,
-      r: 1, //this.rate,
-      t: 's16',
-   }).concat('-'));
+      r: this.rate,
+      t: 's32',// + this.chunkSize,
+   }).concat('-'));*/
     
+   ps.stdin.on('error', function(err) {
+      console.error('soxy.ps error: ', err);
+   });
+
+   try {
    lastStream.pipe(soxyStream).pipe(ps.stdin);
+   } catch(e) {
+      console.err(e);
+   }
 };
 
-function SoxyStream() {
-   Stream.Transform.call(this);
+// SoxyStream Class
+
+function SoxyStream(opts) {
+   opts = opts || {};
+
+   Stream.Transform.call(this, { objectMode: true });
+
+   this.chunkSize = opts.chunkSize || 16;
+
+   switch(this.chunkSize) {
+      default:
+         this.writeBufFn = Buffer.prototype.writeInt16BE;
+         break;
+   }
 }
 
 Util.inherits(SoxyStream, Stream.Transform);
 
-SoxyStream.prototype._transform = function(buf, encoding, done) {
-   var bufInt = (buf.readUInt32BE(0) << 8) + buf.readUInt32BE(1);
-   //console.log('SoxyStream', bufInt);
+SoxyStream.prototype._transform = function(signalData, encoding, done) {
+   console.log('SoxyStream In', signalData);
 
-   this.push(buf);
+   //var outBuf = new Buffer(this.chunkSize / 8);
+   var outBuf = new Buffer(2);
+   console.log('buf.length', outBuf.length);
+
+   this.writeBufFn.call(outBuf, signalData.signal, 0);
+
+   console.log('SoxyStream Out', outBuf);
+
+   this.push(outBuf);
 
    done();
 };
@@ -77,10 +116,13 @@ function mergeArgs(opts, args) {
     }, []);
 }
 
+// SoxyTimeStream Class
+
 function SoxyTimeStream() {
    Stream.Readable.call(this, { objectMode: true });
 
    this.time = 0;
+   this.hasData = false;
 
    this.setNextTick();
    this.pushTime();
@@ -93,33 +135,22 @@ SoxyTimeStream.prototype.setNextTick = function() {
 };
 
 SoxyTimeStream.prototype.pushTime = function() {
-   //console.log('time', this.time);
-
-   if (this.time < 100) {
-      var num = this.time;
-      var buf = new Buffer(8);
-
-      //console.log('num', num);
-
-      buf.writeUInt32BE(num >> 8, 0);
-      buf.writeUInt32BE(num & 0x00ff, 1);
-
-      //console.log('buf', buf);
-      //
-      this.push(buf);
-
-      this.setNextTick();
-   }
-   else if(this.time === 100) {
-      //console.log('ending..');
-      this.push(null);
-   }
-
    ++this.time;
+   this.hasData = true;
 };
 
 SoxyTimeStream.prototype._read = function(size) {
-   function clamp (x) {
-      return Math.max(Math.min(x, Math.pow(2,15)-1), -Math.pow(2,15));
+   if (this.hasData) {
+      if (this.time < 100) {
+         this.push({ time: this.time, signal: 0 });
+
+         this.setNextTick();
+      }
+      else if(this.time === 100) {
+         //console.log('ending..');
+         this.push(null);
+      }
    }
+
+   this.hasData = false;
 };

@@ -5,32 +5,46 @@ module.exports = function(id) {
    return new Filter(id);
 };
 
-function Filter(id) {
-   this.id = id;
+function Filter(opts) {
+   opts = opts || {};
+
+   this.id = opts.id || '';
+   this.chunkSize = opts.chunkSize || 16;
 }
 
 Filter.prototype.getStream = function() {
    return new FilterStream(this.filter.bind(this));
 };
 
-Filter.prototype.decodeInt = function(buf) {
-   return (buf.readUInt32BE(0) << 8) + buf.readUInt32BE(1);
+Filter.prototype.filter = function(signalData) {
+   var newSignal = Math.floor(Math.random() * this.chunkSize);
+
+   newSignal *= Math.random() > 0.5 ? -1 : 1;
+
+   signalData.signal += newSignal;
+
+   signalData.signal = this._normalizeSignal(signalData.signal);
+
+   console.log('FilterStream(' + this.id + ').filter', signalData);
+
+   return signalData;
 };
 
-Filter.prototype.filter = function(buf, encoding) {
-   console.log('FilterStream(' + this.id + ')', this.decodeInt(buf));
+Filter.prototype._normalizeSignal = function(signal) {
+    if (isNaN(signal)) return 0;
 
-   return buf;
+    var limitSignalValue  = Math.pow(2, this.chunkSize - 2);
+
+    return signal > 0
+        ? Math.min(limitSignalValue - 1, Math.floor((limitSignalValue * signal) - 1))
+        : Math.max(-limitSignalValue, Math.ceil((limitSignalValue * signal) - 1));
 };
 
 function FilterStream(callback) {
-   Stream.Transform.call(this);
+   Stream.Transform.call(this, { objectMode: true });
 
-   this.on('pipe', function() {
-      //console.log('being piped');
-   });
-   this.on('error', function() {
-      console.log('FilterStream error');
+   this.on('error', function(err) {
+      console.log('FilterStream error', err);
    });
 
    this.callback = callback;
@@ -38,8 +52,12 @@ function FilterStream(callback) {
 
 Util.inherits(FilterStream, Stream.Transform);
 
-FilterStream.prototype._transform = function(chunk, encoding, done) {
-   this.push(this.callback(chunk, encoding));
+FilterStream.prototype._transform = function(signalData, encoding, done) {
+   var newSignalData = this.callback(signalData, encoding);
+   console.log('FilterStream (transform)', newSignalData);
+
+   this.push(newSignalData);
+
    done();
 };
 
