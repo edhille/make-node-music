@@ -3,6 +3,7 @@ var should = require('should'),
    //Events = require('events'),
    Util = require('util'),
    SoxyTimer = require('../../soxy/timer'),
+   SineFilter = require('../../filters/simpleSine'),
    SoxyConverter = require('../../soxy/converter');
 
 describe('SoxyConverter', function() {
@@ -45,6 +46,7 @@ describe('SoxyConverter', function() {
 	describe('_transform', function() {
 		var soxyConverter = null,
 			soxyTimer = null,
+			testFilter = null,
 			testReaderStream = null,
 			transformCallbackData = null;
 
@@ -62,26 +64,30 @@ describe('SoxyConverter', function() {
 
 		beforeEach(function() {
 			soxyConverter = new SoxyConverter();
-			soxyTimer = new SoxyTimer({ startSignal: 2, timeLimit: 1 });
+			soxyTimer = new SoxyTimer({ startSignal: 0, startTime: 30, timeLimit: 31 });
+			testFilter = new SineFilter({ debug: true });
 			testReaderStream = new TestReaderStream();
 		});
 
 		afterEach(function() {
 			soxyConverter = null;
 			soxyTimer = null;
+			testFilter = null;
 			testReaderStream = null;
 			transformCallbackData = null;
 		});
 
 		it('should convert signal data to Sox-compliant format', function(done) {
-			soxyTimer.pipe(soxyConverter).pipe(testReaderStream);
+			soxyTimer.pipe(testFilter).pipe(soxyConverter).pipe(testReaderStream);
 
 			soxyTimer.start();
 
 			setTimeout(function() {
+				should.exist(transformCallbackData);
+
 				transformCallbackData.should.be.an.instanceOf(Buffer);
 
-				transformCallbackData.readInt16LE(0).should.equal(2);
+				transformCallbackData.readInt16LE(0).should.equal(220);
 
 				done();
 			}, 30);

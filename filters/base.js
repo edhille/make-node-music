@@ -6,6 +6,7 @@ function Filter(opts) {
 	opts = opts || {};
 
 	this.id = opts.id || 'NO ID';
+	this.debug = opts.debug || false;
 
 	Stream.Transform.call(this, { objectMode: true });
 	Events.EventEmitter.call(this);

@@ -48,8 +48,13 @@ SoxyTimeStream.prototype._pushTime = function() {
 };
 
 SoxyTimeStream.prototype._writeTimeData = function() {
+	var signalData = new SignalData({
+		time: this.time, 
+		channelCount: this.channels, 
+		startSignal: this.startSignal
+	});
 
-	this.push(new SignalData({ time: this.time, channelCount: this.channels, startSignal: this.startSignal }));
+	this.push(signalData);
 };
 
 SoxyTimeStream.prototype._read = function(size) {
