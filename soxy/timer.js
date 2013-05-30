@@ -7,6 +7,7 @@ function SoxyTimeStream(opts) {
 	Stream.Readable.call(this, { objectMode: true });
 
 	this.time = opts.startTime || 0;
+	this.signal = opts.startSignal || 0;
 	this.tickLength = opts.tickLength || 10;
 	this.timeLimit = opts.timeLimit || Number.POSITIVE_INFINITY;
 	this.debug = opts.debug || false;
@@ -45,7 +46,7 @@ SoxyTimeStream.prototype._pushTime = function() {
 };
 
 SoxyTimeStream.prototype._writeTimeData = function() {
-	this.push({ time: this.time, signal: 0 });
+	this.push({ time: this.time, signal: this.signal });
 };
 
 SoxyTimeStream.prototype._read = function(size) {

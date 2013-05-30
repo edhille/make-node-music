@@ -3,7 +3,6 @@ var Stream = require('stream'),
     Util = require('util');
 
 function Filter(opts) {
-	if (this.id === 'INHERIT_TEST') console.log('INHERITED...');
 	opts = opts || {};
 
 	this.id = opts.id || 'NO ID';

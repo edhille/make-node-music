@@ -9,6 +9,10 @@ function Soxy(opts) {
 
 	this.filters = opts.filters || [];
 	this.timerOpts = opts.timer || {};
+
+    this.size = opts.size || 2048;
+    this.rate = opts.rate || 44000;
+	this.channels = [];
 }
 
 Util.inherits(Soxy, Events.EventEmitter);

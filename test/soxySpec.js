@@ -8,43 +8,61 @@ describe('Soxy', function() {
 
 	describe('instantiation', function() {
 
-		it('should be an Event Emitter', function() {
-			var soxy = new Soxy();
+		describe('default', function() {
+			var soxy = null;
 
-			(soxy instanceof Events.EventEmitter).should.be.true;
-		});
-
-		it('should set up instance with no filters by default', function() {
-			var soxy = new Soxy();
-			
-			soxy.filters.should.have.lengthOf(0);
-		});
-
-		it('should allow for filters in the constructor', function() {
-			var soxy = new Soxy({
-				filters: [
-					Filter({ id: 'one' }),
-					Filter({ id: 'two' })
-				]
+			beforeEach(function() {
+				soxy = new Soxy();
 			});
 
-			soxy.filters.should.have.lengthOf(2);
-		});
-
-		it('should default to no timer options', function() {
-			var soxy = new Soxy();
-			soxy.timerOpts.should.not.be.undefined;
-		});
-
-		it('should allow for custom timer options', function() {
-			var soxy = new Soxy({
-				timer: {
-					timeLimit: 1
-				}
+			afterEach(function() {
+				soxy = null;
 			});
-			soxy.timerOpts.should.not.be.undefined;
-			soxy.timerOpts.timeLimit.should.equal(1);
+
+			it('should be an Event Emitter', function() {
+				(soxy instanceof Events.EventEmitter).should.be.true;
+			});
+
+			it('should set up instance with no filters by default', function() {
+				soxy.filters.should.have.lengthOf(0);
+			});
+
+			it('should default to no timer options', function() {
+				soxy.timerOpts.should.not.be.undefined;
+			});
+
+			it('should set a default bit depth');
+
+			it('should set a default sample rate');
 		});
+
+
+		describe('configured', function() {
+			it('should allow for filters in the constructor', function() {
+				var soxy = new Soxy({
+					filters: [
+						Filter({ id: 'one' }),
+						Filter({ id: 'two' })
+					]
+				});
+
+				soxy.filters.should.have.lengthOf(2);
+			});
+
+			it('should allow for custom timer options', function() {
+				var soxy = new Soxy({
+					timer: {
+						timeLimit: 1
+					}
+				});
+				soxy.timerOpts.should.not.be.undefined;
+				soxy.timerOpts.timeLimit.should.equal(1);
+			});
+
+			it('should allow custom bit depth');
+
+			it('should allow a custom sample rate');
+		}):
 	});
 
 	describe('filter management', function() {
@@ -127,14 +145,28 @@ describe('Soxy', function() {
 			timeData = [];
 		});
 
-
 		it('should be able to alter signal data', function(done) {
-			// TODO: should also allow setting timer options in play (without overriding default)
 			soxy.play();
 
 			setTimeout(function() {
 				timeData.should.have.lengthOf(1);
 				timeData[0].signal.should.equal(1);
+				done();
+			}, 30);
+		});
+
+		it('should allow for timer setting overrides, without touching the defaults', function() {
+			soxy.play({
+				timer: {
+					timeLimit: 2
+				}
+			});
+
+			soxy.timerOpts.timeLimit.should.equal(1);
+
+			setTimeout(function() {
+				timeData.should.have.lengthOf(2);
+				timeData[0].signal.should.equal(2);
 				done();
 			}, 30);
 		});

@@ -29,6 +29,10 @@ describe('SoxyTimer', function() {
 			it('should tick length of 10ms', function() {
 				soxyTimer.tickLength.should.equal(10);
 			});
+
+			it('should start signal at zero', function() {
+				soxyTimer.signal.should.equal(0);
+			});
 		});
 
 		describe('configured', function() {
@@ -38,6 +42,13 @@ describe('SoxyTimer', function() {
 				var soxyTime = new SoxyTimer({ startTime: startTime });
 
 				soxyTime.time.should.equal(startTime);
+			});
+		
+			it('should allow arbitrary start signal', function() {
+				var startSignal = 100;
+				var soxyTime = new SoxyTimer({ startSignal: startSignal });
+
+				soxyTime.signal.should.equal(startSignal);
 			});
 		
 			it('should allow arbitrary time limit', function() {
