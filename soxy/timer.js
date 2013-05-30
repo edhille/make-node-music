@@ -1,5 +1,6 @@
 var Stream = require('stream'),
-    Util   = require('util');
+    Util   = require('util'),
+	SignalData = require('./signalData');
 
 function SoxyTimeStream(opts) {
 	opts = opts || {};
@@ -7,9 +8,10 @@ function SoxyTimeStream(opts) {
 	Stream.Readable.call(this, { objectMode: true });
 
 	this.time = opts.startTime || 0;
-	this.signal = opts.startSignal || 0;
+	this.startSignal = opts.startSignal || 0;
 	this.tickLength = opts.tickLength || 10;
 	this.timeLimit = opts.timeLimit || Number.POSITIVE_INFINITY;
+	this.channels = opts.channels || 1;
 	this.debug = opts.debug || false;
 	this.curTimer = null;
 
@@ -46,7 +48,8 @@ SoxyTimeStream.prototype._pushTime = function() {
 };
 
 SoxyTimeStream.prototype._writeTimeData = function() {
-	this.push({ time: this.time, signal: this.signal });
+
+	this.push(new SignalData({ time: this.time, channelCount: this.channels, startSignal: this.startSignal }));
 };
 
 SoxyTimeStream.prototype._read = function(size) {

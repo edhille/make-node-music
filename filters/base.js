@@ -14,10 +14,15 @@ function Filter(opts) {
 Util.inherits(Filter, Events.EventEmitter);
 Util.inherits(Filter, Stream.Transform);
 
-Filter.prototype._transform = function(object, encoding, callback) {
-	if (this.updateSignal) this.updateSignal(object);
+Filter.prototype._transform = function(signalData, encoding, callback) {
+	if (this.updateSignal) this.updateSignal(signalData);
 	
+	this.push(signalData);
+
 	callback();
 };
+
+Filter.prototype.TAU = Math.PI * 2;
+Filter.prototype.DEG_TO_RAD = 0.0174532925;
 
 module.exports = Filter;

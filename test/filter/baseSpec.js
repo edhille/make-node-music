@@ -2,8 +2,9 @@ var should = require('should'),
    Stream = require('stream'),
    Events = require('events'),
    Util = require('util'),
-   Soxy = require('../soxy2');
-   Filter = require('../filters/base');
+   Soxy = require('../../soxy2');
+   Filter = require('../../filters/base'),
+   SignalData = require('../../soxy/signalData');
 
 describe('Base Filter Class', function() {
 	
@@ -25,11 +26,11 @@ describe('Base Filter Class', function() {
 			});
 
 			it('should be a Transform Stream', function() {
-				(filter instanceof Stream.Transform).should.be.true;
+				filter.should.be.an.instanceOf(Stream.Transform);
 			});
 
 			it('should be an Event Emitter', function() {
-				(filter instanceof Events.EventEmitter).should.be.true;
+				filter.should.be.an.instanceOf(Events.EventEmitter);
 			});
 		});
 
@@ -55,7 +56,7 @@ describe('Base Filter Class', function() {
 			});
 
 			it('should not alter the given signal data by default', function() {
-				var signalData = { time: 0, signal: 0 },
+				var signalData = new SignalData();
 					calledCallback = false;
 				
 				filter._transform(signalData, null, function() {
@@ -79,7 +80,7 @@ describe('Base Filter Class', function() {
 		Util.inherits(TestFilterSubclass, Filter);
 		
 		TestFilterSubclass.prototype.updateSignal = function(signalData) {
-			++signalData.signal;
+			++signalData.channels[0];
 
 			timeData.push(signalData);
 		};
@@ -94,7 +95,7 @@ describe('Base Filter Class', function() {
 		});
 
 		it('should be an instance of a Filter', function() {
-			(subFilter instanceof Filter).should.be.true;
+			subFilter.should.be.an.instanceOf(Filter);
 		});
 
 		it('should have an id that we assigned', function() {
@@ -102,7 +103,7 @@ describe('Base Filter Class', function() {
 		});
 
 		it('should update the siganl data passed in for transformation', function() {
-			var signalData = { time: 0, signal: 0 },
+			var signalData = new SignalData();
 				callbackCalled = false;
 
 			subFilter._transform(signalData, null, function() {
@@ -110,7 +111,7 @@ describe('Base Filter Class', function() {
 			});
 
 			callbackCalled.should.be.true;
-			signalData.signal.should.equal(1);
+			signalData.channels[0].should.equal(1);
 		});
 	});
 });

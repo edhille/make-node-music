@@ -20,7 +20,7 @@ describe('Soxy', function() {
 			});
 
 			it('should be an Event Emitter', function() {
-				(soxy instanceof Events.EventEmitter).should.be.true;
+				soxy.should.be.an.instanceOf(Events.EventEmitter);
 			});
 
 			it('should set up instance with no filters by default', function() {
@@ -31,9 +31,10 @@ describe('Soxy', function() {
 				soxy.timerOpts.should.not.be.undefined;
 			});
 
-			it('should set a default bit depth');
-
-			it('should set a default sample rate');
+			it('should set default converter options', function() {
+				soxy.converterOpts.bitDepth.should.equal(16);
+				soxy.converterOpts.sampleRate.should.equal(44100);
+			});
 		});
 
 
@@ -59,10 +60,19 @@ describe('Soxy', function() {
 				soxy.timerOpts.timeLimit.should.equal(1);
 			});
 
-			it('should allow custom bit depth');
+			it('should allow custom converter options', function() {
+				var converterOpts = {
+					bitDepth: 32,
+					sampleRate: 22050
+				},
+				soxy = new Soxy({
+					converter: converterOpts
+				});
 
-			it('should allow a custom sample rate');
-		}):
+				soxy.converterOpts.bitDepth.should.equal(converterOpts.bitDepth);
+				soxy.converterOpts.sampleRate.should.equal(converterOpts.sampleRate);
+			});
+		});
 	});
 
 	describe('filter management', function() {
@@ -124,7 +134,7 @@ describe('Soxy', function() {
 		Util.inherits(TestFilterSubclass, Filter);
 		
 		TestFilterSubclass.prototype.updateSignal = function(signalData) {
-			++signalData.signal;
+			++signalData.channels[0];
 
 			timeData.push(signalData);
 		};
@@ -150,7 +160,7 @@ describe('Soxy', function() {
 
 			setTimeout(function() {
 				timeData.should.have.lengthOf(1);
-				timeData[0].signal.should.equal(1);
+				timeData[0].channels[0].should.equal(1);
 				done();
 			}, 30);
 		});

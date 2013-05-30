@@ -20,19 +20,24 @@ describe('SoxyConverter', function() {
 				soxyConverter = null;
 			});
 
-			it('should have basic buffer size for 16bit integer', function() {
-				soxyConverter.bufSize.should.equal(2);
+			it('should have basic format for signed 16bit integer', function() {
+				soxyConverter.format.should.equal('s16');
+			});
+
+			it('should have a Buffer write method to write signed 16bit, little-endian values', function() {
+				soxyConverter.bufWriter.should.equal(Buffer.prototype.writeInt16LE);
 			});
 		});
 
 		describe('custom', function() {
-			it('should allow us to change buffer size', function() {
-				var TEST_BUF_SIZE = 4,
+			it('should allow us to change format to unsigned', function() {
+				var TEST_FORMAT = 'u16',
 					soxyConverter = new SoxyConverter({
-						buffSize: TEST_BUF_SIZE	
+						signed: false
 					});
 
-				soxyConverter.bufSize.should.equal(TEST_BUF_SIZE);
+				soxyConverter.format.should.equal(TEST_FORMAT);
+				soxyConverter.bufWriter.should.equal(Buffer.prototype.writeUInt16LE);
 			});
 		});
 	});
@@ -74,9 +79,9 @@ describe('SoxyConverter', function() {
 			soxyTimer.start();
 
 			setTimeout(function() {
-				(transformCallbackData instanceof Buffer).should.be.true;
+				transformCallbackData.should.be.an.instanceOf(Buffer);
 
-				transformCallbackData.readUInt16BE(0).should.equal(2);
+				transformCallbackData.readInt16LE(0).should.equal(2);
 
 				done();
 			}, 30);

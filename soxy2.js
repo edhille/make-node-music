@@ -2,13 +2,15 @@ var Stream = require('stream'),
     Util   = require('util'),
     Events = require('events'),
     spawn  = require('child_process').spawn,
-	SoxyTimeStream = require('./soxy/timer');
+	SoxyTimeStream = require('./soxy/timer'),
+	SoxyConverterStream = require('./soxy/converter');
 
 function Soxy(opts) {
 	opts = opts || {};
 
 	this.filters = opts.filters || [];
 	this.timerOpts = opts.timer || {};
+	this.converterOpts = opts.converter || { bitDepth: 16, sampleRate: 44100 };
 
     this.size = opts.size || 2048;
     this.rate = opts.rate || 44000;

@@ -31,11 +31,22 @@ describe('SoxyTimer', function() {
 			});
 
 			it('should start signal at zero', function() {
-				soxyTimer.signal.should.equal(0);
+				soxyTimer.startSignal.should.equal(0);
+			});
+
+			it('should have only one channel', function() {
+				soxyTimer.channels.should.equal(1);
 			});
 		});
 
 		describe('configured', function() {
+		
+			it('should allow arbitrary channels', function() {
+				var TEST_CHANNELS = 100;
+				var soxyTime = new SoxyTimer({ channels: TEST_CHANNELS});
+
+				soxyTime.channels.should.equal(TEST_CHANNELS);
+			});
 		
 			it('should allow arbitrary start time', function() {
 				var startTime = 100;
@@ -48,7 +59,7 @@ describe('SoxyTimer', function() {
 				var startSignal = 100;
 				var soxyTime = new SoxyTimer({ startSignal: startSignal });
 
-				soxyTime.signal.should.equal(startSignal);
+				soxyTime.startSignal.should.equal(startSignal);
 			});
 		
 			it('should allow arbitrary time limit', function() {
