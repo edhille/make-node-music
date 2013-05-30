@@ -12,9 +12,7 @@ function Soxy(opts) {
 	this.timerOpts = opts.timer || {};
 	this.converterOpts = opts.converter || { bitDepth: 16, sampleRate: 44100 };
 
-    this.size = opts.size || 2048;
-    this.rate = opts.rate || 44000;
-	this.channels = [];
+	if (!this.timerOpts.channels) this.timerOpts.channels = 1;
 }
 
 Util.inherits(Soxy, Events.EventEmitter);
@@ -51,17 +49,38 @@ Soxy.prototype.removeFilter = function(filter) {
 	}
 };
 
+function mergeArgs(opts, args) {
+    Object.keys(opts || {}).forEach(function (key) {
+        args[key] = opts[key];
+    });
+    
+    return Object.keys(args).reduce(function (acc, key) {
+        var dash = key.length === 1 ? '-' : '--';
+        return acc.concat(dash + key, args[key]);
+    }, []);
+}
+
 Soxy.prototype.play = function(opts) {
 	opts = opts || {};
 
 	var soxyTimer = new SoxyTimeStream(this.timerOpts),
 		lastStream = soxyTimer,
+		converterStream = new SoxyConverterStream(this.converterOpts),
 		filterLen = this.filters.length,
 		i = 0;
 
 	for (; i < filterLen; ++i) {
 		lastStream = lastStream.pipe(this.filters[i]);
 	}
+
+	lastStream = lastStream.pipe(converterStream);
+
+	//lastStream.pipe(process.stdout);
+	var ps = spawn('play', mergeArgs(opts, {
+		c: soxyTimer.channels.length,
+		r: converterStream.sampleRate,
+		t: converterStream.format
+	}).concat('-'));
 
 	soxyTimer.start();
 };

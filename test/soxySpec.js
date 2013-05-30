@@ -29,6 +29,7 @@ describe('Soxy', function() {
 
 			it('should default to no timer options', function() {
 				soxy.timerOpts.should.not.be.undefined;
+				soxy.timerOpts.channels.should.equal(1);
 			});
 
 			it('should set default converter options', function() {
@@ -52,12 +53,14 @@ describe('Soxy', function() {
 
 			it('should allow for custom timer options', function() {
 				var soxy = new Soxy({
+					channels: 1,
 					timer: {
 						timeLimit: 1
 					}
 				});
 				soxy.timerOpts.should.not.be.undefined;
 				soxy.timerOpts.timeLimit.should.equal(1);
+				soxy.timerOpts.channels.should.equal(1);
 			});
 
 			it('should allow custom converter options', function() {
