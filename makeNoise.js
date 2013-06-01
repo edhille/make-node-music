@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var Soxy = require('./soxy2'),
+var Soxy = require('./soxy'),
     SineFilter = require('./filters/simpleSine');
 
 console.log('Ready to make sounds?');

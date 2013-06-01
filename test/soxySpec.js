@@ -1,7 +1,7 @@
 var should = require('should'),
    Events = require('events'),
    Util = require('util'),
-   Soxy = require('../soxy2'),
+   Soxy = require('../soxy'),
    Filter = require('../filters/base');
 
 describe('Soxy', function() {

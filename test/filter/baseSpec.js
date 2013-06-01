@@ -2,7 +2,7 @@ var should = require('should'),
    Stream = require('stream'),
    Events = require('events'),
    Util = require('util'),
-   Soxy = require('../../soxy2');
+   Soxy = require('../../soxy'),
    Filter = require('../../filters/base'),
    SignalData = require('../../soxy/signalData');
 
