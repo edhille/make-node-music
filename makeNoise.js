@@ -7,7 +7,7 @@ console.log('Ready to make sounds?');
 
 var soxy = new Soxy({
 	timer: {
-		timeLimit: 1200
+		timeLimit: 200000
 	}
 });
 

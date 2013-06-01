@@ -96,7 +96,7 @@ describe('Simple Sine Filter Class', function() {
 				sineFilter.updateSignal(signalData);
 
 				// NOTE: of course this is floating-point, so it's not that precise...
-				Math.ceil(signalData.channels[0]).should.equal(220);
+				Math.ceil(signalData.channels[0]).should.equal(1);
 			});
 		});
 	});

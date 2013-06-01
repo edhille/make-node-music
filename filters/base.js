@@ -23,6 +23,10 @@ Filter.prototype._transform = function(signalData, encoding, callback) {
 	callback();
 };
 
+Filter.prototype._flush = function(callback) {
+   callback();
+};
+
 Filter.prototype.TAU = Math.PI * 2;
 Filter.prototype.DEG_TO_RAD = 0.0174532925;
 

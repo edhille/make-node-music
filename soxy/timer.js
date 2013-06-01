@@ -14,6 +14,7 @@ function SoxyTimeStream(opts) {
 	this.channels = opts.channels || 1;
 	this.debug = opts.debug || false;
 	this.curTimer = null;
+   this.isStarted = false;
 
 	if (opts.startImmediately) {
 		this.start();
@@ -23,28 +24,13 @@ function SoxyTimeStream(opts) {
 Util.inherits(SoxyTimeStream, Stream.Readable);
 
 SoxyTimeStream.prototype.start = function() {
-	this._pushTime();
+	//this._pushTime();
+   this.isStarted = true;
+   this._read();
 };
 
 SoxyTimeStream.prototype.stop = function() {
-	clearTimeout(this.currTimer);
-	this.emit('end');
-};
-
-SoxyTimeStream.prototype._setNextTick = function() {
-   this.currTimer = setTimeout(this._pushTime.bind(this), this.tickLength);
-};
-
-SoxyTimeStream.prototype._pushTime = function() {
-	if (this.time < this.timeLimit) {
-		this._writeTimeData();
-		this._setNextTick();
-
-		++this.time;
-	}
-	else {
-		this.stop();
-	}
+   this.push(null);
 };
 
 SoxyTimeStream.prototype._writeTimeData = function() {
@@ -58,7 +44,16 @@ SoxyTimeStream.prototype._writeTimeData = function() {
 };
 
 SoxyTimeStream.prototype._read = function(size) {
-	// empty...
+   if (!this.isStarted) return;
+
+	if (this.time < this.timeLimit) {
+		this._writeTimeData();
+
+		++this.time;
+	}
+	else if (this.time === this.timeLimit) {
+		this.stop();
+	}
 };
 
 module.exports = SoxyTimeStream;

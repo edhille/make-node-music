@@ -6,8 +6,10 @@ function SineFilter(opts) {
 
 	this.freq = opts.freq || 440; // middle-A
 	this.type = opts.type || 'additive'; // additive|substractive|multiplicative|divisive
-
+   this.sampleRate = opts.sampleRate || 44100;
+   this.precalc = this.TAU * this.freq
 	this.operator = this._buildOperator(this.type);
+   this.cache = [];
 
 	Filter.call(this, opts);
 }
@@ -15,14 +17,20 @@ function SineFilter(opts) {
 Util.inherits(SineFilter, Filter);
 
 SineFilter.prototype.updateSignal = function(signalData) {
-	var channelCount = signalData.channels.length,
-		timeInRad = this.DEG_TO_RAD * signalData.time,
-		i = 0;
+	var channelCount = 0,
+       cacheKey = signalData.time % this.sampleRate,
+		 i = 0;
 
-	for (; i < channelCount; ++i) {
-		// NOTE: other examples have used sin(TAU * t * freq)...
-		signalData.channels[i] = this.operator((Math.sin(timeInRad) * this.freq), signalData.channels[i]);
-	}
+   // TODO: test cache...
+   if (!this.cache[cacheKey]) {
+      this.cache[cacheKey] = [];
+      channelCount = signalData.channels.length;
+      for (; i < channelCount; ++i) {
+         this.cache[cacheKey][i] = this.operator(Math.sin(this.precalc * (signalData.time / this.sampleRate)), signalData.channels[i]);
+      }
+   }
+
+   signalData.channels = this.cache[cacheKey];
 };
 
 SineFilter.prototype._buildOperator = function(type) {

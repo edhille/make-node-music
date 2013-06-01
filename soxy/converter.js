@@ -55,9 +55,9 @@ SoxyConverter.prototype._loadBuffer = function(buf, signalData) {
 	// NOTE: this is a heavy refactoring of code from baudio which I still do not entirely understand...
 
     function normalizeIntValue(rawValue, boundingValue) {
-		rawValue = Math.round(rawValue);
+      rawValue = Math.round(rawValue * boundingValue);
 
-        return Math.max(Math.min(rawValue, boundingValue - 1), -boundingValue);
+      return Math.max(Math.min(rawValue, boundingValue - 1), -boundingValue);
     }
 
 	function normalizeFloatValue(rawValue, boundingValue) {
@@ -74,18 +74,18 @@ SoxyConverter.prototype._loadBuffer = function(buf, signalData) {
 		signalValue = 0;
 
     for (var i = 0; i < buf.length; i += 2) {
-        rawChannelSignal = signalData.channels[(i / 2) % signalData.channels.length];
+      rawChannelSignal = signalData.channels[(i / 2) % signalData.channels.length];
 
-        signalvalue = 0;
+      signalvalue = 0;
 
-        if (this.isFloat) {
-            signalValue = normalizeFloatValue(rawChannelSignal, boundingValue);
-        }
-        else {
-			signalValue = normalizeIntValue(rawChannelSignal, boundingValue);
-        }
+      if (this.isFloat) {
+         signalValue = normalizeFloatValue(rawChannelSignal, boundingValue);
+      }
+      else {
+         signalValue = normalizeIntValue(rawChannelSignal, boundingValue);
+      }
         
-		this.bufWriter.call(buf, signalValue, i);
+      this.bufWriter.call(buf, signalValue, i);
     }
 };
 

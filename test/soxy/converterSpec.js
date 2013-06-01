@@ -87,7 +87,7 @@ describe('SoxyConverter', function() {
 
 				transformCallbackData.should.be.an.instanceOf(Buffer);
 
-				transformCallbackData.readInt16LE(0).should.equal(220);
+				transformCallbackData.readInt16LE(0).should.equal(31207);
 
 				done();
 			}, 30);

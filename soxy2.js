@@ -75,12 +75,15 @@ Soxy.prototype.play = function(opts) {
 
 	lastStream = lastStream.pipe(converterStream);
 
-	//lastStream.pipe(process.stdout);
-	var ps = spawn('play', mergeArgs(opts, {
-		c: soxyTimer.channels.length,
+   var playOpts = mergeArgs(opts, {
+		c: this.timerOpts.channels,
 		r: converterStream.sampleRate,
 		t: converterStream.format
-	}).concat('-'));
+	});
+
+	var ps = spawn('play', playOpts.concat('-'));
+
+   lastStream.pipe(ps.stdin);
 
 	soxyTimer.start();
 };
