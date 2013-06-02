@@ -4,7 +4,6 @@
   "description": "playing with baudio",
   "main": "makeNoise.js",
   "dependencies": {
-    "baudio": "~1.0.0"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
@@ -15,7 +14,7 @@
   },
   "repository": "",
   "keywords": [
-    "baudio",
+    "streams",
     "audio",
     "demo"
   ],
