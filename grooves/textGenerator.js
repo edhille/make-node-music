@@ -1,3 +1,5 @@
+// NOTE: this is legacy from a previous implementation and does not work currently
+//       it is kept as a reference for parsing text to generate "note" data
 var sample = "Some bit of text that can be converted into notes and then played",
     notes  = [],
     sineGenerators = [],

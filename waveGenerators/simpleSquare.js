@@ -1,3 +1,4 @@
+// NOTE: this is legacy and is not available for use (it's only reference for future implementations)
 var Constants = require('./constants');
 
 exports.generator = function(freq) {
